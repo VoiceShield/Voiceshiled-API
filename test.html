@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Form</title>
+</head>
+<body>
+    <h1>Prediction Form</h1>
+    
+    <form id="predictionForm" enctype="multipart/form-data">
+        <label for="predictionType">Choose Prediction Type:</label>
+        <select id="predictionType" name="predictionType">
+            <option value="text">Text Prediction</option>
+            <option value="audio">Audio Prediction</option>
+        </select>
+        <br>
+
+        <!-- Text Prediction Section -->
+        <div id="textPredictionSection">
+            <label for="textInput">Enter Text:</label>
+            <textarea id="textInput" name="text" rows="4" cols="50"></textarea>
+            <br>
+            <button type="button" onclick="predictText()">Predict Text</button>
+        </div>
+
+        <!-- Audio Prediction Section -->
+        <div id="audioPredictionSection">
+            <label for="audioFile">Choose Audio File:</label>
+            <input type="file" id="audioFile" name="audioFile" accept=".wav, .mp3">
+            <br>
+            <button type="button" onclick="predictAudio()">Predict Audio</button>
+        </div>
+
+    </form>
+
+    <h2>Result:</h2>
+    <p id="result"></p>
+
+    <script>
+        function predictText() {
+            // Get the text from the textarea
+            var textInput = document.getElementById("textInput").value;
+
+            // Make a POST request to the FastAPI endpoint for text prediction
+            fetch("http://127.0.0.1:8000/api/v2/predict/text", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    text: textInput
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Update the result paragraph with the text prediction
+                document.getElementById("result").innerText = `Predicted Class: ${data.predicted_class} Confidence: ${data.confidence}`;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function predictAudio() {
+            // Get the audio file input
+            var audioFile = document.getElementById("audioFile").files[0];
+
+            // Create a FormData object and append the audio file
+            var formData = new FormData();
+            formData.append('audio', audioFile);
+
+            // Make a POST request to the FastAPI endpoint for audio prediction
+            fetch("http://127.0.0.1:8000/api/v3/predict/audio", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Update the result paragraph with the audio prediction
+                document.getElementById("result").innerText = `Predicted Class: ${data.predicted_class} Confidence: ${data.confidence}`;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>

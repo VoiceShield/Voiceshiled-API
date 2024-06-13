@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+scikit-learn
+numpy
+keras
+tensorflow
+librosa
+python-multipart
+resampy
+pandas
